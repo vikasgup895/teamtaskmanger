@@ -41,15 +41,15 @@ export default function Sidebar({ open, onClose }) {
         </div>
 
         {/* Global Search (Placeholder) */}
-        <div className="px-4 py-3">
+        {/* <div className="px-4 py-3">
           <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-400">
             <Search size={14} />
             <span className="text-xs font-medium">Search...</span>
-            <span className="ml-auto rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] font-bold text-slate-400 shadow-sm">
-              ⌘K
-            </span>
+             <span className="ml-auto rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] font-bold text-slate-400 shadow-sm">
+              
+            </span> 
           </div>
-        </div>
+        </div> */}
 
         {/* Navigation */}
         <nav className="flex-1 space-y-1 px-3 py-2">
