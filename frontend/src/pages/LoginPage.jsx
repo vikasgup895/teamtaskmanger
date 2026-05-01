@@ -22,7 +22,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(form.email, form.password);
-      navigate('/dashboard');
+      navigate('/workspace');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
     } finally {
@@ -104,6 +104,50 @@ export default function LoginPage() {
               </>
             )}
           </button>
+
+          <div className="flex gap-3 mt-4">
+            <button
+              type="button"
+              onClick={async () => {
+                setForm({ email: 'admin@demo.com', password: 'password123' });
+                setError('');
+                setLoading(true);
+                try {
+                  await login('admin@demo.com', 'password123');
+                  navigate('/workspace');
+                } catch (err) {
+                  setError(err.response?.data?.message || 'Login failed. Please try again.');
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              disabled={loading}
+              className="btn-secondary flex-1 gap-2 py-2.5 text-xs sm:text-sm"
+            >
+              Demo Admin
+            </button>
+            
+            <button
+              type="button"
+              onClick={async () => {
+                setForm({ email: 'member@demo.com', password: 'password123' });
+                setError('');
+                setLoading(true);
+                try {
+                  await login('member@demo.com', 'password123');
+                  navigate('/workspace');
+                } catch (err) {
+                  setError(err.response?.data?.message || 'Login failed. Please try again.');
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              disabled={loading}
+              className="btn-secondary flex-1 gap-2 py-2.5 text-xs sm:text-sm"
+            >
+              Demo Member
+            </button>
+          </div>
         </form>
 
         <p className="mt-5 text-center text-sm text-slate-500">
