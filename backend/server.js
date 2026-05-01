@@ -50,17 +50,6 @@ app.use('/api', (req, res) => {
   res.status(404).json({ message: 'API Route not found.' });
 });
 
-// Serve frontend in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
-
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../frontend', 'dist', 'index.html'));
-  });
-} else {
-  app.get('/', (req, res) => res.send('API is running...'));
-}
-
 // Global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -69,5 +58,11 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`));
+// Run server locally (Vercel will ignore this and use the exported app)
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`));
+}
+
+// Export for Vercel serverless
+module.exports = app;
