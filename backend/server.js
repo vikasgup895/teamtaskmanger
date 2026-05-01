@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
@@ -44,10 +45,21 @@ app.use('/api/workspace', require('./routes/workspace'));
 // Health check
 app.get('/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ message: 'Route not found.' });
+// 404 handler for API routes
+app.use('/api', (req, res) => {
+  res.status(404).json({ message: 'API Route not found.' });
 });
+
+// Serve frontend in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../frontend', 'dist', 'index.html'));
+  });
+} else {
+  app.get('/', (req, res) => res.send('API is running...'));
+}
 
 // Global error handler
 app.use((err, req, res, next) => {
