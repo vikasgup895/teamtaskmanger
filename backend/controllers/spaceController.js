@@ -10,13 +10,18 @@ const createSpace = async (req, res) => {
       return res.status(400).json({ message: errors.array()[0].msg });
     }
 
-    const { name, description } = req.body;
+    const { name, description, memberIds } = req.body;
+
+    let members = [req.user._id.toString()];
+    if (memberIds && Array.isArray(memberIds)) {
+      members = [...new Set([...members, ...memberIds])];
+    }
 
     const space = await Space.create({
       name,
       description,
       createdBy: req.user._id,
-      members: [req.user._id]
+      members
     });
 
     await space.populate('createdBy', 'name email');

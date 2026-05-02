@@ -8,10 +8,21 @@ import { useToast } from '../components/Toast';
 import api from '../utils/api';
 
 function CreateSpaceModal({ onClose, onCreate }) {
+  const { user } = useAuth();
   const [form, setForm] = useState({ name: '', description: '' });
+  const [selectedMembers, setSelectedMembers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const toast = useToast();
+
+  useEffect(() => {
+    api.get('/auth/users').then(res => setAllUsers(res.data.users)).catch(() => {});
+  }, []);
+
+  const toggleMember = (id) => {
+    setSelectedMembers(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +31,7 @@ function CreateSpaceModal({ onClose, onCreate }) {
 
     setLoading(true);
     try {
-      const res = await api.post('/spaces', form);
+      const res = await api.post('/spaces', { ...form, memberIds: selectedMembers });
       onCreate(res.data.space);
       toast.success('Space created successfully!');
       onClose();
@@ -61,9 +72,33 @@ function CreateSpaceModal({ onClose, onCreate }) {
               onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
               className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none transition-colors focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
               placeholder="What's this space for?"
-              rows={3}
+              rows={2}
             />
           </div>
+
+          <div>
+            <label className="mb-1.5 block text-sm font-semibold text-slate-700">Add Members <span className="text-xs text-slate-400 font-normal">(Optional)</span></label>
+            <div className="max-h-40 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50 p-2">
+              {allUsers.filter(u => u._id !== user?._id).map(u => (
+                <label key={u._id} className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 hover:bg-slate-100 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={selectedMembers.includes(u._id)}
+                    onChange={() => toggleMember(u._id)}
+                    className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <div className="flex flex-col">
+                    <span className="text-sm font-semibold text-slate-900">{u.name}</span>
+                    <span className="text-xs text-slate-500">{u.email}</span>
+                  </div>
+                </label>
+              ))}
+              {allUsers.length <= 1 && (
+                <p className="text-xs text-slate-500 px-3 py-2">No other users found.</p>
+              )}
+            </div>
+          </div>
+
           <div className="pt-2">
             <button type="submit" disabled={loading} className="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-bold text-white transition-all hover:bg-indigo-700 active:scale-[0.98]">
               {loading ? 'Creating...' : 'Create Space'}
